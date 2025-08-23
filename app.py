@@ -67,16 +67,10 @@ if 'prediction_history' not in st.session_state:
 
 # Functions
 @st.cache_resource
-model_url = 'https://github.com/FadilahKurniawanH/Fundus-Vision/blob/main/best_fundus_model.h5'
-
-response = requests.get(model_url, stream=True)
-
-with open('best_fundus_model.h5', 'wb') as file:
-    for chunk in response.iter_content(chunk_size=1024):
-        if chunk:
-            file.write(chunk)
-
-model = load_model('best_fundus_model.h5')
+MODEL_PATH = "best_fundus_model.h5"
+if not os.path.exists(MODEL_PATH):
+    url = "https://github.com/FadilahKurniawanH/Fundus-Vision/blob/main/best_fundus_model.h5"
+    gdown.download(url, MODEL_PATH, quiet=False)
 
 
 def preprocess_image(image, img_size=224):
