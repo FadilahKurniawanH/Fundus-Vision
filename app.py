@@ -67,50 +67,17 @@ if 'prediction_history' not in st.session_state:
 
 # Functions
 @st.cache_resource
-def load_model():
-    """Load the trained model with error handling"""
-    try:
-        # Method 1: Try loading with compile=False
-        model_path = "./best_fundus_model.h5"
-        if os.path.exists(model_path):
-            st.info(f"Loading model from: {os.path.abspath(model_path)}")
-            
-            try:
-                # First try: Load without compilation
-                model = tf.keras.models.load_model(model_path, compile=False)
-                st.success("Model loaded successfully (without compilation)")
-                return model
-            except Exception as e1:
-                st.warning(f"Failed to load without compilation: {e1}")
-                
-                try:
-                    # Second try: Load with custom objects
-                    model = tf.keras.models.load_model(
-                        model_path, 
-                        custom_objects=None,
-                        compile=False
-                    )
-                    st.success("Model loaded with custom objects")
-                    return model
-                except Exception as e2:
-                    st.error(f"Failed with custom objects: {e2}")
-                    
-                    try:
-                        # Third try: Load with different method
-                        model = tf.keras.models.load_model(model_path)
-                        st.success("Model loaded with default method")
-                        return model
-                    except Exception as e3:
-                        st.error(f"All loading methods failed: {e3}")
-                        return None
-        else:
-            st.error("Model file not found")
-            return None
-            
-    except Exception as e:
-        st.error(f"Unexpected error: {str(e)}")
-        st.write(f"Error type: {type(e).__name__}")
-        return None
+model_url = 'https://github.com/FadilahKurniawanH/Fundus-Vision/blob/main/best_fundus_model.h5'
+
+response = requests.get(model_url, stream=True)
+
+with open('best_fundus_model.h5', 'wb') as file:
+    for chunk in response.iter_content(chunk_size=1024):
+        if chunk:
+            file.write(chunk)
+
+model = load_model('best_fundus_model.h5')
+
 
 def preprocess_image(image, img_size=224):
     """Preprocess image for prediction"""
